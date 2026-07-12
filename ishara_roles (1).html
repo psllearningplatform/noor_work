@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إشارة — توزيع الأدوار</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b0f14;
+    --surface: #121822;
+    --surface-2: #182130;
+    --line: #232d3c;
+    --signal: #3ecf8e;
+    --signal-dim: #3ecf8e33;
+    --noor: #f2545b;
+    --noor-dim: #f2545b22;
+    --frontend: #4fa3ff;
+    --frontend-dim: #4fa3ff33;
+    --text: #e8ecf1;
+    --muted: #7c8798;
+    --muted-2: #4d5766;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Tajawal', sans-serif;
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{ font-family:'Cairo', sans-serif; }
+  ::selection{ background:var(--signal-dim); color:var(--signal); }
+
+  /* ===== hero ===== */
+  .hero{
+    position:relative;
+    min-height:44vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:60px 24px 40px;
+    overflow:hidden;
+  }
+  .hero-grid{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:44px 44px;
+    opacity:.35;
+    mask-image: radial-gradient(ellipse at center, black 10%, transparent 70%);
+  }
+  #handSvg{ width:min(360px, 60vw); height:auto; position:relative; z-index:2; margin-bottom:8px; }
+  #handSvg circle{ fill:var(--signal); filter:drop-shadow(0 0 6px var(--signal-dim)); }
+  #handSvg line{ stroke:var(--signal); stroke-width:1.4; opacity:.55; }
+  #handSvg .pt{ opacity:0; animation: pop .5s ease forwards; }
+  #handSvg .ln{ stroke-dasharray: 60; stroke-dashoffset:60; animation: draw .6s ease forwards; }
+  @keyframes pop{ to{ opacity:1; } }
+  @keyframes draw{ to{ stroke-dashoffset:0; } }
+
+  .eyebrow{
+    position:relative; z-index:2;
+    font-size:.78rem; letter-spacing:.12em;
+    color:var(--signal); font-weight:700;
+    margin-bottom:14px;
+  }
+  .hero h1{
+    position:relative; z-index:2;
+    font-size:clamp(2.6rem, 7vw, 4.6rem);
+    font-weight:900;
+    background: linear-gradient(180deg, #ffffff, #b9c4d1);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero p{
+    position:relative; z-index:2;
+    max-width:560px; color:var(--muted);
+    font-size:1.02rem; margin-top:14px;
+  }
+
+  /* ===== linear pipeline ===== */
+  .pipeline-wrap{ padding: 10px 24px 70px; }
+  .pipeline{
+    max-width:1000px; margin:0 auto;
+    display:flex; align-items:stretch; justify-content:space-between;
+    gap:10px; position:relative; padding-bottom:34px;
+  }
+  .pipeline::before{
+    content:''; position:absolute; top:26px; right:8%; left:8%; height:1px;
+    background: repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 14px);
+    z-index:0;
+  }
+  .return-arc{ position:absolute; left:0; right:0; bottom:-4px; height:34px; overflow:visible; z-index:0; }
+  .return-arc path{ fill:none; stroke:var(--frontend); stroke-width:1.6; stroke-dasharray:5 5; opacity:.8; }
+  .stage{
+    position:relative; z-index:1; flex:1; text-align:center;
+    padding-top:0;
+  }
+  .stage .dot{
+    width:52px; height:52px; border-radius:50%;
+    background:var(--surface); border:2px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 14px; font-family:'Cairo'; font-weight:700; font-size:.85rem;
+    color:var(--muted); transition:.25s;
+  }
+  .stage.owner-noor .dot{ border-color:var(--noor); color:var(--noor); box-shadow:0 0 0 4px var(--noor-dim); }
+  .stage.owner-nadine .dot{ border-color:var(--frontend); color:var(--frontend); box-shadow:0 0 0 4px var(--frontend-dim); }
+  .stage.owner-shahd .dot{ border-color:var(--signal); color:var(--signal); box-shadow:0 0 0 4px var(--signal-dim); }
+  .stage small{ display:block; color:var(--muted-2); font-size:.72rem; margin-top:4px; }
+  .stage strong{ font-size:.88rem; }
+  .loop-label{ text-align:center; color:var(--muted-2); font-size:.78rem; margin-top:4px; }
+  .legend{ display:flex; justify-content:center; gap:24px; margin-top:26px; flex-wrap:wrap; }
+  .legend-item{ display:flex; align-items:center; gap:8px; font-size:.85rem; color:var(--muted); }
+  .legend-swatch{ width:22px; height:4px; border-radius:2px; display:inline-block; }
+  .swatch-frontend{ background:var(--frontend); }
+  .swatch-backend{ background:var(--noor); }
+  .swatch-dataset{ background:var(--signal); }
+
+  /* ===== tabs ===== */
+  .section-label{
+    text-align:center; color:var(--muted); font-size:.85rem;
+    letter-spacing:.05em; margin-bottom:6px;
+  }
+  .section-title{
+    text-align:center; font-size:clamp(1.6rem,4vw,2.2rem); font-weight:700;
+    margin-bottom:36px;
+  }
+  .tabs{
+    max-width:720px; margin:0 auto 40px; display:flex;
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:6px; gap:6px;
+  }
+  .tab{
+    flex:1; text-align:center; padding:14px 10px; border-radius:10px;
+    cursor:pointer; font-family:'Cairo'; font-weight:700; font-size:.95rem;
+    color:var(--muted); transition:.2s; border:1px solid transparent;
+    display:flex; flex-direction:column; gap:2px; align-items:center;
+  }
+  .tab span.role{ font-size:.72rem; font-weight:400; color:var(--muted-2); }
+  .tab.active{ background:var(--surface-2); color:var(--text); border-color:var(--line); }
+  .tab[data-member="noor"].active{ color:var(--noor); }
+  .tab[data-member="noor"].active span.role{ color:var(--noor); opacity:.75; }
+  .tab[data-member="nadine"].active, .tab[data-member="shahd"].active{ color:var(--signal); }
+  .tab[data-member="nadine"].active span.role, .tab[data-member="shahd"].active span.role{ color:var(--signal); opacity:.75; }
+
+  .panels{ max-width:920px; margin:0 auto; padding:0 24px 100px; }
+  .panel{ display:none; animation: fadeIn .35s ease; }
+  .panel.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  /* general card grid (Nadine / Shahd) */
+  .cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    padding:22px 20px;
+  }
+  .card .num{ font-family:'Cairo'; color:var(--signal); font-weight:700; font-size:.8rem; margin-bottom:10px; }
+  .card h3{ font-size:1.05rem; margin-bottom:8px; }
+  .card p{ color:var(--muted); font-size:.9rem; }
+  .card p a{ color:var(--signal); text-decoration:none; border-bottom:1px dotted #3ecf8e66; }
+  .card p a:hover{ border-bottom-style:solid; }
+  .contract-note{
+    margin-top:24px; padding:18px 20px; border-radius:14px;
+    background:var(--signal-dim); border:1px solid #3ecf8e44;
+    font-size:.88rem; color:#bfeedb;
+  }
+  .contract-note b{ color:var(--signal); }
+
+  /* Noor detailed */
+  .noor-lead{
+    display:flex; align-items:center; gap:14px; margin-bottom:26px;
+    padding:18px 20px; border-radius:14px;
+    background:var(--noor-dim); border:1px solid #f2545b3a;
+  }
+  .noor-lead .badge{
+    width:42px; height:42px; border-radius:50%; background:var(--noor);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cairo'; font-weight:900; color:#0b0f14; flex-shrink:0;
+  }
+  .noor-lead p{ color:#f6c3c6; font-size:.9rem; }
+
+  .accordion{ display:flex; flex-direction:column; gap:10px; }
+  .acc-item{ background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  .acc-head{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:18px 20px; cursor:pointer; user-select:none;
+  }
+  .acc-head-left{ display:flex; align-items:center; gap:14px; }
+  .acc-head .tag{
+    font-family:'Cairo'; font-size:.72rem; font-weight:700; color:var(--noor);
+    background:var(--noor-dim); border:1px solid #f2545b33;
+    padding:3px 10px; border-radius:20px; white-space:nowrap;
+  }
+  .acc-head h3{ font-size:1rem; }
+  .acc-head .chev{ color:var(--muted); transition:.25s; flex-shrink:0; }
+  .acc-item.open .chev{ transform:rotate(180deg); }
+  .acc-body{ max-height:0; overflow:hidden; transition:max-height .3s ease; }
+  .acc-item.open .acc-body{ max-height:900px; }
+  .acc-body-inner{ padding:0 20px 22px; color:var(--muted); font-size:.9rem; }
+  .acc-body-inner ul{ padding-right:20px; margin-top:8px; display:flex; flex-direction:column; gap:6px; }
+  .acc-body-inner li::marker{ color:var(--noor); }
+  .mini-table{ width:100%; border-collapse:collapse; margin-top:12px; font-size:.85rem; }
+  .mini-table th{ text-align:right; color:var(--text); font-family:'Cairo'; font-weight:700; padding:8px 10px; border-bottom:1px solid var(--line); }
+  .mini-table td{ padding:8px 10px; border-bottom:1px solid var(--line); color:var(--muted); }
+  .mini-table tr:last-child td{ border-bottom:none; }
+
+  .option-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin-top:14px; }
+  .option-card{ background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .option-head{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .option-tag{ width:24px; height:24px; border-radius:50%; background:var(--noor-dim); color:var(--noor); border:1px solid #f2545b33; display:flex; align-items:center; justify-content:center; font-family:'Cairo'; font-weight:700; font-size:.75rem; flex-shrink:0; }
+  .option-head h4{ font-family:'Cairo'; font-size:.92rem; color:var(--text); }
+  .option-desc{ color:var(--muted); font-size:.85rem; margin-bottom:10px; }
+  .pc-row ul{ padding-right:18px; display:flex; flex-direction:column; gap:5px; font-size:.82rem; }
+  .pc-row.good ul li::marker{ color:var(--signal); }
+  .pc-row.bad ul li::marker{ color:var(--noor); }
+  .pc-row.bad{ margin-top:8px; }
+  .static-note{
+    margin-top:16px; padding:14px 16px; border-radius:12px;
+    background:var(--surface-2); border:1px dashed var(--muted-2);
+    font-size:.85rem; color:var(--muted);
+  }
+
+  footer{ text-align:center; padding:30px 24px 50px; color:var(--muted-2); font-size:.8rem; }
+</style>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <svg id="handSvg" viewBox="0 0 200 220"></svg>
+    <div class="eyebrow">مشروع التخرج — إشارة</div>
+  </section>
+
+  <div class="pipeline-wrap">
+    <div class="pipeline">
+      <svg class="return-arc" viewBox="0 0 100 30" preserveAspectRatio="none">
+        <path d="M 8 2 Q 50 30 92 2" marker-end="url(#arrowReturn)"/>
+        <defs>
+          <marker id="arrowReturn" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" style="fill:var(--frontend)"/>
+          </marker>
+        </defs>
+      </svg>
+      <div class="stage owner-nadine"><div class="dot">1</div><strong>الكاميرا</strong><small>نادين</small></div>
+      <div class="stage owner-nadine"><div class="dot">2</div><strong>MediaPipe</strong><small>نادين</small></div>
+      <div class="stage owner-noor"><div class="dot">3</div><strong>الـ API</strong><small>نور</small></div>
+      <div class="stage owner-shahd"><div class="dot">4</div><strong>موديل LSTM</strong><small>شهد</small></div>
+      <div class="stage owner-noor"><div class="dot">5</div><strong>النتيجة</strong><small>نور</small></div>
+    </div>
+    <div class="loop-label">↺ الرد يرجع من النتيجة للكاميرا، ليُعرض على المستخدم بالفرونت</div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch swatch-frontend"></span>الفرونت — نادين</div>
+      <div class="legend-item"><span class="legend-swatch swatch-backend"></span>الباك إند — نور</div>
+      <div class="legend-item"><span class="legend-swatch swatch-dataset"></span>الداتا/الموديل — شهد</div>
+    </div>
+  </div>
+
+  <div class="section-label">من يفعل ماذا</div>
+  <div class="section-title">ثلاثة أدوار، مشروع واحد</div>
+
+  <div class="tabs">
+    <div class="tab" data-member="nadine">نادين العزة <span class="role">Frontend</span></div>
+    <div class="tab" data-member="noor">نور <span class="role">Backend — تفصيلي</span></div>
+    <div class="tab" data-member="shahd">شهد بطة <span class="role">Data / ML</span></div>
+  </div>
+
+  <div class="panels">
+
+    <!-- NADINE -->
+    <div class="panel" data-panel="nadine">
+      <div class="cards">
+        <div class="card"><div class="num">01</div><h3>واجهة الدروس والوحدات</h3><p>بناء صفحات الوحدات والدروس والتمارين بأسلوب تعليمي متدرّج، مع عرض الفيديوهات المرجعية لكل إشارة. يفيد الاطّلاع على تطبيقات مشابهة كمرجع: <a href="https://www.signlingoapp.com/try-demo" target="_blank" rel="noopener">Signlingo</a>، <a href="https://esharti.net/" target="_blank" rel="noopener">إشارتي</a>، و<a href="https://mushirgp.wixsite.com/mushirapp" target="_blank" rel="noopener">Mushir</a>.</p></div>
+        <div class="card"><div class="num">02</div><h3>تشغيل MediaPipe بالمتصفح</h3><p>التقاط يد المستخدم عبر الكاميرا مباشرة، ورسم نقاط اليد (Landmarks) على الفيديو كفيدباك بصري فوري.</p></div>
+        <div class="card"><div class="num">03</div><h3>تجميع وإرسال البيانات</h3><p>تجميع سلسلة اللاندماركس عبر الفريمات بالتنسيق المتفق عليه، وإرسالها لباك نور عبر طلب API.</p></div>
+        <div class="card"><div class="num">04</div><h3>عرض نتيجة التقييم</h3><p>استقبال الرد (صح/غلط + نسبة الثقة) وعرضه للمستخدم بشكل واضح ومشجّع على الاستمرار بالتعلّم.</p></div>
+      </div>
+      <div class="contract-note"><b>نقطة تنسيق حرجة:</b> شكل الـ landmarks (landmark array) الذي ترسله نادين يجب أن يطابق تمامًا الشكل الذي دربت عليه شهد الموديل — هذا هو "عقد الداتا".</div>
+    </div>
+
+    <!-- SHAHD -->
+    <div class="panel" data-panel="shahd">
+      <div class="cards">
+        <div class="card"><div class="num">01</div><h3>الداتاسيت والمقارنة اللهجوية</h3><p>الاعتماد على KArSL-100 كأساس، وقيادة جلسة المقارنة مع جمعية الصم لتحديد الإشارات المختلفة عن اللهجة الفلسطينية.</p></div>
+        <div class="card"><div class="num">02</div><h3>تصميم بنية LSTM</h3><p>اختيار عدد الطبقات، حجم الوحدات، وتقنيات منع الـ overfitting مثل الـ Dropout.</p></div>
+        <div class="card"><div class="num">03</div><h3>التدريب وتقسيم البيانات</h3><p>تقسيم الداتا إلى train/validation/test، وتشغيل التدريب الفعلي ومراقبة الدقة والخسارة.</p></div>
+        <div class="card"><div class="num">04</div><h3>ضبط الـ Hyperparameters</h3><p>تحسين learning rate وbatch size وعدد الـ epochs للوصول لأفضل دقة ممكنة.</p></div>
+        <div class="card"><div class="num">05</div><h3>تغليف الموديل بـ FastAPI</h3><p>بناء راوت <code>/predict</code> يستقبل اللاندماركس من باك نور، ويرجع اسم الإشارة ونسبة الثقة.</p></div>
+      </div>
+      <div class="contract-note">شهد تملك <b>٧٠٪</b> من عمل التدريب فعليًا (تصميم، تدريب، ضبط)، بينما بقية الفريق يشارك بـ <b>٣٠٪</b> عبر متابعة العملية وفهم منطقها — خصوصًا أن التحضير (تصوير، MediaPipe، تنظيم البيانات) جهد جماعي بالكامل قبل هذه المرحلة.</div>
+    </div>
+
+    <!-- NOOR -->
+    <div class="panel active" data-panel="noor">
+      <div class="noor-lead">
+        <div class="badge">ن</div>
+        <p>دور نور يغطي الباك بالكامل + نقطة التكامل الحرجة بين الفرونت والموديل — هنا التفصيل الكامل لكل جزء من هذا الدور.</p>
+      </div>
+
+      <div class="accordion">
+
+        <div class="acc-item open">
+          <div class="acc-head">
+            <div class="acc-head-left"><span class="tag">01</span><h3>المصادقة وإدارة المستخدمين (Auth)</h3></div>
+            <span class="chev">⌄</span>
+          </div>
+          <div class="acc-body"><div class="acc-body-inner">
+            بناء تسجيل الدخول وإنشاء الحساب باستخدام Node/Express، مع تشفير كلمات المرور وإدارة الجلسات (JWT أو ما يعادلها).
+            <ul>
+              <li>Endpoints: تسجيل، دخول، تحديث بيانات المستخدم</li>
+              <li>ربطها بجدول Users</li>
+            </ul>
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <div class="acc-head">
+            <div class="acc-head-left"><span class="tag">02</span><h3>قاعدة البيانات — سبعة جداول</h3></div>
+            <span class="chev">⌄</span>
+          </div>
+          <div class="acc-body"><div class="acc-body-inner">
+            تصميم وتنفيذ schema الـ MongoDB بالكامل، مع العلاقات بين الجداول.
+            <table class="mini-table">
+              <tr><th>الجدول</th><th>الوظيفة</th></tr>
+              <tr><td>Users</td><td>بيانات المستخدمين وحساباتهم</td></tr>
+              <tr><td>Units</td><td>الوحدات التعليمية (الأبجدية، الأرقام...)</td></tr>
+              <tr><td>Lessons</td><td>الدروس داخل كل وحدة</td></tr>
+              <tr><td>Signs</td><td>الإشارات المرجعية لكل درس</td></tr>
+              <tr><td>Exercises</td><td>التمارين المرتبطة بكل إشارة</td></tr>
+              <tr><td>UserProgress</td><td>تتبع تقدم المستخدم بكل درس</td></tr>
+              <tr><td>UserAttempts</td><td>سجل محاولات المستخدم للتحليل</td></tr>
+            </table>
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <div class="acc-head">
+            <div class="acc-head-left"><span class="tag">03</span><h3>عمليات CRUD الأساسية</h3></div>
+            <span class="chev">⌄</span>
+          </div>
+          <div class="acc-body"><div class="acc-body-inner">
+            بناء الـ endpoints لإدارة المحتوى التعليمي وعرضه للفرونت.
+            <ul>
+              <li>إنشاء/تعديل/حذف الوحدات والدروس والإشارات (لوحة تحكم أو seed data)</li>
+              <li>جلب المحتوى للفرونت حسب تسلسل الدروس</li>
+            </ul>
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <div class="acc-head">
+            <div class="acc-head-left"><span class="tag">04</span><h3>تتبّع التقدّم (Progress Tracking)</h3></div>
+            <span class="chev">⌄</span>
+          </div>
+          <div class="acc-body"><div class="acc-body-inner">
+            منطق حفظ وتحديث تقدّم كل مستخدم عبر UserProgress، وربطه بواجهة نادين لعرض النسب والإنجازات.
+            <ul>
+              <li>تحديث الحالة (مكتمل/قيد التنفيذ) والنتيجة بعد كل تمرين</li>
+            </ul>
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <div class="acc-head">
+            <div class="acc-head-left"><span class="tag">05</span><h3>التكامل مع موديل شهد (الأهم)</h3></div>
+            <span class="chev">⌄</span>
+          </div>
+          <div class="acc-body"><div class="acc-body-inner">
+            استقبال اللاندماركس من نادين، تمريرها لسيرفر FastAPI تبع شهد عبر <code>/predict</code>، ثم إرجاع نتيجة واضحة (صح/غلط) للفرونت.
+            <ul>
+              <li>هذه الـ 10% من الكود التي تحتاج تواصل خارج Node، لكنها مجرد HTTP request عادي</li>
+              <li>المسؤولية الكاملة عن أن "عقد الداتا" مطابق بين الطرفين الثلاثة</li>
+            </ul>
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <div class="acc-head">
+            <div class="acc-head-left"><span class="tag">06</span><h3>طريقة إرسال بيانات التمرين — قرار معلّق</h3></div>
+            <span class="chev">⌄</span>
+          </div>
+          <div class="acc-body"><div class="acc-body-inner">
+            بالنسبة للإشارات الديناميكية (حركة متسلسلة، ليست حرف أو رقم ثابت)، فيه خياران للطريقة التي بترسل فيها نادين الفريمات لباك نور:
+
+            <div class="option-grid">
+              <div class="option-card">
+                <div class="option-head"><span class="option-tag">١</span><h4>WebSocket — تدفق مباشر مستمر</h4></div>
+                <p class="option-desc">الكاميرا تفتح، وباستمرار (فريم فريم) اللاندماركس بتترسل عبر اتصال مفتوح، والموديل بيرجّع تقييم حي أثناء الحركة.</p>
+                <div class="pc-row good">
+                  <ul><li>إحساس حقيقي بـ"لايف" — فيدباك لحظة بلحظة</li><li>ولا صورة أو فيديو يتخزّن</li></ul>
+                </div>
+                <div class="pc-row bad">
+                  <ul><li>بنية أعقد: اتصال WebSocket مرتين (فرونت↔Node، Node↔FastAPI)</li>
+                  <li>لازم اتفاق مع شهد على windowing — كل كام فريم تُؤخذ نافذة وتُرسل للموديل</li>
+                  <li>تعقيد إدارة الاتصال، انقطاع الشبكة، تزامن الفريمات</li></ul>
+                </div>
+              </div>
+              <div class="option-card">
+                <div class="option-head"><span class="option-tag">٢</span><h4>تسجيل قصير ثم معالجة (Batch)</h4></div>
+                <p class="option-desc">الكاميرا تفتح والمستخدم شايف نفسه، لكن التسجيل الفعلي مقطع قصير محدد (2-4 ثواني)، وبيترسل دفعة وحدة، والنتيجة بترجع بعد المعالجة.</p>
+                <div class="pc-row good">
+                  <ul><li>إحساس بالمباشرة موجود بدون تعقيد التدفق المستمر</li>
+                  <li>ولا صورة أو فيديو يتخزّن (اللاندماركس فقط تُستخرج وتُرسل)</li>
+                  <li>طلب HTTP واحد فقط — أبسط بكثير من إدارة WebSocket</li></ul>
+                </div>
+                <div class="pc-row bad">
+                  <ul><li>مافي فيدباك أثناء الحركة نفسها — بس بعد ما يخلص</li></ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="static-note">بالنسبة للحروف والأرقام (بكلا الخيارين): هاي دايمًا صورة واحدة (فريم واحد) → موديل بسيط منفصل (مش LSTM)، بغض النظر شو انقرر للإشارات الديناميكية. ما محتاجة WebSocket ولا تسجيل مقطع أصلًا.</div>
+          </div></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <footer>إشارة — منصة تعلّم لغة الإشارة الفلسطينية</footer>
+
+<script>
+  // hand landmark hero animation
+  const svg = document.getElementById('handSvg');
+  const pts = [
+    [100,190],[80,150],[70,110],[63,80],[58,55],
+    [90,100],[88,55],[86,20],[84,-8],
+    [100,95],[100,45],[100,8],[100,-22],
+    [112,100],[116,55],[119,22],[122,-5],
+    [125,110],[133,75],[139,48],[144,25]
+  ].map(([x,y])=>[x, y+40]);
+  const bones = [
+    [0,1],[1,2],[2,3],[3,4],
+    [0,5],[5,6],[6,7],[7,8],
+    [0,9],[9,10],[10,11],[11,12],
+    [0,13],[13,14],[14,15],[15,16],
+    [0,17],[17,18],[18,19],[18,20]
+  ].filter(([a,b])=>b<pts.length);
+  let svgContent = '';
+  bones.forEach(([a,b],i)=>{
+    if(!pts[a]||!pts[b]) return;
+    svgContent += `<line class="ln" x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" style="animation-delay:${i*30}ms"/>`;
+  });
+  pts.forEach((p,i)=>{
+    svgContent += `<circle class="pt" cx="${p[0]}" cy="${p[1]}" r="3.4" style="animation-delay:${i*25}ms"/>`;
+  });
+  svg.innerHTML = svgContent;
+
+  // tabs
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  function setActive(member){
+    tabs.forEach(t=>t.classList.toggle('active', t.dataset.member===member));
+    panels.forEach(p=>p.classList.toggle('active', p.dataset.panel===member));
+  }
+  tabs.forEach(t=> t.addEventListener('click', ()=> setActive(t.dataset.member)) );
+  setActive('noor');
+
+  // accordion
+  document.querySelectorAll('.acc-head').forEach(head=>{
+    head.addEventListener('click', ()=>{
+      head.parentElement.classList.toggle('open');
+    });
+  });
+</script>
+</body>
+</html>
